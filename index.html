@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Powerball Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .top-section {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        .input-section {
+            flex: 1;
+        }
+        .winning-numbers {
+            margin-bottom: 20px;
+        }
+		.winning-numbers input::-webkit-outer-spin-button,
+		.winning-numbers input::-webkit-inner-spin-button {
+		  -webkit-appearance: none;
+		  margin: 0;
+		}
+		.winning-numbers input {
+			width: 80px;
+			height: 80px; /* Make height equal to width */
+			margin-right: 5px;
+			padding: 5px;
+			font-size: 24px;
+			text-align: center;
+			border-radius: 50%; /* This creates the circle shape */
+			border: 1px solid #ccc; /* Add a subtle border */
+			box-sizing: border-box; /* Ensures padding doesn't expand the size */
+		}
+		.winning-numbers input[type=number] {
+		  -moz-appearance: textfield;
+		}
+        .powerball-input {
+            background-color: #ffebee;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        .ticket-result {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .ticket-result:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .ticket-number {
+            min-width: 80px;
+            font-weight: bold;
+        }
+        .number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            margin-right: 5px;
+            background-color: #f0f0f0;
+        }
+        .match {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .powerball-match {
+            background-color: #f44336;
+            color: white;
+        }
+        .ticket-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex-grow: 1;
+        }
+        .numbers-display {
+            min-width: 230px;
+        }
+        .prize-no {
+            color: #f44336;
+        }
+        .prize-win {
+            background-color: #e8f5e9;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        .result-details {
+            color: #666;
+            font-size: 0.9em;
+        }
+        h3 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Prize Table Styles */
+        .prize-table {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            margin-top: 30px;
+        }
+        .prize-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .prize-row.header {
+            font-weight: bold;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .prize-description {
+            font-size: 0.9em;
+        }
+        .prize-odds {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .prize-amount input {
+            width: 100px;
+            padding: 3px;
+            font-size: 0.9em;
+        }
+        .overall-odds {
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px solid #ddd;
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Powerball Checker</h1>
+        
+        <div class="top-section">
+            <div class="input-section">
+                <div class="winning-numbers">
+                    <h3>Enter Winning Numbers:</h3>
+                    <input type="number" id="win1" min="1" max="69" required>
+                    <input type="number" id="win2" min="1" max="69" required>
+                    <input type="number" id="win3" min="1" max="69" required>
+                    <input type="number" id="win4" min="1" max="69" required>
+                    <input type="number" id="win5" min="1" max="69" required>
+                    <input type="number" id="powerball" class="powerball-input" min="1" max="26" required>
+                </div>
+
+                <div>
+                    <h3>Enter Your Tickets (one per line):</h3>
+                    <p>Format: 01 02 03 04 05 06 (last number is Powerball)</p>
+                    <textarea id="tickets" style="font-size:20px" placeholder="Enter your tickets here, one per line"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="checkTickets()">Check Tickets</button>
+
+        <div id="results"></div>
+
+        <div class="prize-table">
+            <h3>Prize Chart</h3>
+            <div class="prize-row header">
+                <div class="prize-description">Match</div>
+                <div class="prize-amount">Prize</div>
+                <div class="prize-odds">Odds</div>
+            </div>
+            <div class="prize-row">
+                <div class="prize-description">5 + Powerball</div>
+                <div class="prize-amount">
+                    <input type="text" id="prize5pb" value="Grand Prize">
+                </div>
+                <div class="prize-odds">1 : 292,201,338.00</div>
+            </div>
+            <div class="prize-row">
+                <div class="prize-description">5</div>
+                <div class="prize-amount">
+                    <input type="text" id="prize5" value="$1,000,000">
+                </div>
+                <div class="prize-odds">1 : 11,688,053.52</div>
+            </div>
+            <div class="prize-row">
+                <div class="prize-description">4 + Powerball</div>
+                <div class="prize-amount">
+                    <input type="text" id="prize4pb" value="$50,000">
+                </div>
+                <div class="prize-odds">1 : 913,129.18</div>
+            </div>
+            <div class="prize-row">
+                <div class="prize-description">4</div>
+                <div class="prize-amount">
+                    <input type="text" id="prize4" value="$100">
+                </div>
+                <div class="prize-odds">1 : 36,525.17</div>
+            </div>
+            <div class="prize-row">
+                <div class="prize-description">3 + Powerball</div>
+                <div class="prize-amount">
+                    <input type="text" id="prize3pb" value="$100">
+                </div>
+                <div class="prize-odds">1 : 14,494.11</div>
+            </div>
+            <div class="prize-row">
+                <div class="prize-description">3</div>
+                <div class="prize-amount">
+                    <input type="text" id="prize3" value="$7">
+                </div>
+                <div class="prize-odds">1 : 579.76</div>
+            </div>
+            <div class="prize-row">
+                <div class="prize-description">2 + Powerball</div>
+                <div class="prize-amount">
+                    <input type="text" id="prize2pb" value="$7">
+                </div>
+                <div class="prize-odds">1 : 701.33</div>
+            </div>
+            <div class="prize-row">
+                <div class="prize-description">1 + Powerball</div>
+                <div class="prize-amount">
+                    <input type="text" id="prize1pb" value="$4">
+                </div>
+                <div class="prize-odds">1 : 91.98</div>
+            </div>
+            <div class="prize-row">
+                <div class="prize-description">Powerball only</div>
+                <div class="prize-amount">
+                    <input type="text" id="prizepb" value="$4">
+                </div>
+                <div class="prize-odds">1 : 38.32</div>
+            </div>
+            <div class="overall-odds">
+                Overall odds of winning a prize: 1 in 24.87
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function padNumber(num) {
+            return num.toString().padStart(2, '0');
+        }
+
+        function getPrizeAmount(matchingNumbers, powerballMatch) {
+            if (matchingNumbers === 5 && powerballMatch) return document.getElementById('prize5pb').value;
+            if (matchingNumbers === 5) return document.getElementById('prize5').value;
+            if (matchingNumbers === 4 && powerballMatch) return document.getElementById('prize4pb').value;
+            if (matchingNumbers === 4) return document.getElementById('prize4').value;
+            if (matchingNumbers === 3 && powerballMatch) return document.getElementById('prize3pb').value;
+            if (matchingNumbers === 3) return document.getElementById('prize3').value;
+            if (matchingNumbers === 2 && powerballMatch) return document.getElementById('prize2pb').value;
+            if (matchingNumbers === 1 && powerballMatch) return document.getElementById('prize1pb').value;
+            if (powerballMatch) return document.getElementById('prizepb').value;
+            return "No Prize";
+        }
+
+        function checkTickets() {
+            const winningNumbers = [
+                parseInt(document.getElementById('win1').value),
+                parseInt(document.getElementById('win2').value),
+                parseInt(document.getElementById('win3').value),
+                parseInt(document.getElementById('win4').value),
+                parseInt(document.getElementById('win5').value)
+            ];
+            const winningPowerball = parseInt(document.getElementById('powerball').value);
+            
+            const tickets = document.getElementById('tickets').value.trim().split('\n');
+            let resultsHTML = '<h3>Results:</h3>';
+
+            tickets.forEach((ticket, index) => {
+                const numbers = ticket.trim().split(/\s+/).map(num => parseInt(num));
+                if (numbers.length !== 6) {
+                    resultsHTML += `<div class="ticket-result">Invalid ticket format on line ${index + 1}</div>`;
+                    return;
+                }
+
+                const ticketNumbers = numbers.slice(0, 5);
+                const ticketPowerball = numbers[5];
+
+                let numbersHTML = '';
+                ticketNumbers.forEach(num => {
+                    const isMatch = winningNumbers.includes(num);
+                    numbersHTML += `<span class="number ${isMatch ? 'match' : ''}">${padNumber(num)}</span>`;
+                });
+                
+                const powerballMatch = ticketPowerball === winningPowerball;
+                numbersHTML += `<span class="number ${powerballMatch ? 'powerball-match' : ''}">${padNumber(ticketPowerball)}</span>`;
+
+                let matchingNumbers = ticketNumbers.filter(num => winningNumbers.includes(num)).length;
+                let prize = getPrizeAmount(matchingNumbers, powerballMatch);
+                const isPrizeWin = prize !== "No Prize";
+
+                resultsHTML += `
+                    <div class="ticket-result">
+                        <div class="ticket-number">Ticket ${index + 1}</div>
+                        <div class="numbers-display">${numbersHTML}</div>
+                        <div class="ticket-info">
+                            <div class="result-details">
+                                Matching Numbers: ${matchingNumbers} | 
+                                Powerball Match: ${powerballMatch ? "Yes" : "No"}
+                            </div>
+                            <div class="${isPrizeWin ? 'prize-win' : 'prize-no'}">
+                                ${isPrizeWin ? '🎖️ ' : ''}${prize}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('results').innerHTML = resultsHTML;
+        }
+    </script>
+</body>
+</html>
